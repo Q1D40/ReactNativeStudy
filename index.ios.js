@@ -1,51 +1,112 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
-
 import React, {
   AppRegistry,
   Component,
   StyleSheet,
+  View,
   Text,
-  View
+  TouchableOpacity,
+  Navigator,
 } from 'react-native';
 
 class ReactNativeStudy extends Component {
+
+  render() {
+    let defaultName = 'MainView';
+    let defaultComponent = MainView;
+    return (
+      <Navigator
+      initialRoute={{ name: defaultName, component: defaultComponent }}
+      configureScene={(route) => {
+        return Navigator.SceneConfigs.PushFromRight;
+      }}
+      renderScene={(route, navigator) => {
+        let Component = route.component;
+        return <Component {...route.params} navigator={navigator} />
+      }}
+      />
+    );
+  }
+
+}
+
+class MainView extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: 2
+    };
+  }
+
+  _pressButton() {
+    const { navigator } = this.props;
+    if(navigator) {
+      navigator.push({
+        name: 'SecView',
+        component: SecView,
+        params: {
+          id: this.state.id
+        }
+      });
+    }
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
+      <View style={styles.cnt}>
+      <TouchableOpacity onPress={this._pressButton.bind(this)}>
+      <Text style={styles.btn}>点击进入</Text>
+      </TouchableOpacity>
       </View>
     );
   }
+
+}
+
+class SecView extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: null
+    };
+  }
+
+  componentDidMount() {
+    this.setState({
+      id: this.props.id
+    });
+  }
+
+  _pressButton() {
+    const { navigator } = this.props;
+    if(navigator) {
+      navigator.pop();
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.cnt}>
+      <Text>id={ this.state.id }</Text>
+      <TouchableOpacity onPress={this._pressButton.bind(this)}>
+      <Text style={styles.btn}>点击返回</Text>
+      </TouchableOpacity>
+      </View>
+    );
+  }
+
 }
 
 const styles = StyleSheet.create({
-  container: {
+  cnt: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  btn: {
+    color: '#23527c',
   },
 });
 
