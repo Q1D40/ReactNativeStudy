@@ -16,19 +16,35 @@ class MainList extends Component {
     super(props);
     let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
-      dataSource: ds.cloneWithRows(['row 1', 'row 2']),
+      dataSource: ds.cloneWithRows([{title:'aaa', images:['http://facebook.github.io/react/img/logo_og.png']}]),
     };
     this._renderRow = this._renderRow.bind(this);
   }
 
-  _renderRow(rowData: string, sectionID: number, rowID: number) {
+  componentDidMount() {
+    this._fetchData();
+  }
+
+  _fetchData() {
+    let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    fetch('https://news-at.zhihu.com/api/3/news/latest')
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({
+          dataSource: ds.cloneWithRows(responseData.stories),
+        });
+      })
+      .done();
+  }
+
+  _renderRow(rowData: object, sectionID: number, rowID: number) {
     return (
       <TouchableHighlight onPress={() => this._pressRow(rowID)}>
         <View>
           <View style={styles.row}>
-            <Image  style={styles.thumb} source={{uri: 'http://facebook.github.io/react/img/logo_og.png'}}/>
+            <Image  style={styles.thumb} source={{uri: rowData.images[0]}}/>
             <Text style={styles.text}>
-              {rowData}
+              {rowData.title}
             </Text>
           </View>
           <View  style={styles.separator}/>
